@@ -1,0 +1,222 @@
+// Art Gallery — Prisma schema
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+}
+
+enum Availability {
+  AVAILABLE
+  SOLD
+  RESERVED
+}
+
+enum ExhibitionStatus {
+  ONGOING
+  UPCOMING
+  PREVIOUS
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  role         Role     @default(ADMIN)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Artist {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String
+  bio       String?
+  imageUrl  String?
+  artworks  Artwork[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model ArtType {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String    @unique
+  artworks  Artwork[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Artwork {
+  id           String       @id @default(cuid())
+  code         String       @unique // e.g. "M320" -> used in WhatsApp message
+  slug         String       @unique
+  title        String
+  imageUrl     String
+  previewUrl   String?
+  alt          String?
+  year         String?
+  medium       String?
+  dimensions   String?
+  description  String?
+  price        Decimal?     @db.Decimal(12, 2)
+  currency     String       @default("BDT")
+  priceVisible Boolean      @default(true)
+  availability Availability @default(AVAILABLE)
+  featured     Boolean      @default(false)
+
+  artistId  String
+  artist    Artist  @relation(fields: [artistId], references: [id], onDelete: Restrict)
+  artTypeId String?
+  artType   ArtType? @relation(fields: [artTypeId], references: [id], onDelete: SetNull)
+
+  images      ArtworkImage[]
+  exhibitions ExhibitionArtwork[]
+  collections CollectionArtwork[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([artistId])
+  @@index([artTypeId])
+  @@index([availability])
+}
+
+model ArtworkImage {
+  id        String  @id @default(cuid())
+  artworkId String
+  artwork   Artwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  sortOrder Int     @default(0)
+
+  @@index([artworkId])
+}
+
+model Exhibition {
+  id           String           @id @default(cuid())
+  slug         String           @unique
+  title        String
+  summary      String?
+  description  String?
+  heroImageUrl String?
+  status       ExhibitionStatus @default(UPCOMING)
+  startDate    DateTime?
+  endDate      DateTime?
+  location     String?
+  featured     Boolean          @default(false)
+  published    Boolean          @default(true)
+
+  artworks ExhibitionArtwork[]
+  images   ExhibitionImage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([featured])
+}
+
+model ExhibitionImage {
+  id           String     @id @default(cuid())
+  exhibitionId String
+  exhibition   Exhibition @relation(fields: [exhibitionId], references: [id], onDelete: Cascade)
+  url          String
+  alt          String?
+  sortOrder    Int        @default(0)
+
+  @@index([exhibitionId])
+}
+
+model ExhibitionArtwork {
+  exhibitionId String
+  artworkId    String
+  sortOrder    Int        @default(0)
+  exhibition   Exhibition @relation(fields: [exhibitionId], references: [id], onDelete: Cascade)
+  artwork      Artwork    @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+
+  @@id([exhibitionId, artworkId])
+  @@index([artworkId])
+}
+
+model Collection {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  description   String?
+  coverImageUrl String?
+  featured      Boolean  @default(false)
+  sortOrder     Int      @default(0)
+
+  artworks CollectionArtwork[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([featured])
+}
+
+model CollectionArtwork {
+  collectionId String
+  artworkId    String
+  sortOrder    Int        @default(0)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  artwork      Artwork    @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, artworkId])
+  @@index([artworkId])
+}
+
+model CarouselSlide {
+  id        String  @id @default(cuid())
+  imageUrl  String
+  headline  String?
+  subtext   String?
+  ctaLabel  String?
+  ctaHref   String?
+  sortOrder Int     @default(0)
+  active    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  title     String
+  body      String?
+  imageUrl  String?
+  location  String?
+  startDate DateTime?
+  endDate   DateTime?
+  published Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSetting {
+  id               String  @id @default("singleton")
+  galleryName      String  @default("Art Gallery")
+  tagline          String?
+  whatsappNumber   String  @default("01325402965")
+  whatsappTemplate String  @default("Hello, I would like to inquire about the {medium} artwork with the code: {code}.")
+  contactEmail     String?
+  contactPhone     String?
+  address          String?
+  instagramUrl     String?
+  facebookUrl      String?
+  aboutText        String?
+
+  updatedAt DateTime @updatedAt
+}

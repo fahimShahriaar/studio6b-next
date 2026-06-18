@@ -1,0 +1,26 @@
+
+> studio6b-next@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.225:3000
+- Environments: .env
+✓ Ready in 1504ms
+
+ GET /api/auth/csrf 200 in 5.7s (next.js: 5.6s, application-code: 170ms)
+ POST /api/auth/callback/credentials 302 in 976ms (next.js: 32ms, application-code: 945ms)
+ POST /api/upload 401 in 1016ms (next.js: 975ms, application-code: 41ms)
+ POST /api/upload 200 in 77ms (next.js: 10ms, application-code: 67ms)
+○ Compiling / ...
+ GET / 200 in 19.3s (next.js: 14.1s, application-code: 5.2s)
+ GET /whats-on 200 in 2.4s (next.js: 1682ms, application-code: 695ms)
+ GET /exhibitions 200 in 2.3s (next.js: 2.0s, application-code: 210ms)
+ GET /collections 200 in 3.6s (next.js: 2.8s, application-code: 801ms)
+ GET /collections?artist=cmqceseie0007ww5686x8bk3x 200 in 592ms (next.js: 15ms, application-code: 577ms)
+ GET /collections?artist=cmqceseie0007ww5686x8bk3x 200 in 194ms (next.js: 11ms, application-code: 183ms)
+ GET /collections?artist=cmqceseie0007ww5686x8bk3x&type=cmqcesei70005ww56d54cqqs7 200 in 206ms (next.js: 11ms, application-code: 195ms)
+ GET /collections?artist=cmqceseie0007ww5686x8bk3x 200 in 292ms (next.js: 10ms, application-code: 283ms)
+ GET / 200 in 246ms (next.js: 13ms, application-code: 233ms)
+ GET / 200 in 1803ms (next.js: 124ms, application-code: 1678ms)
+ GET / 200 in 1924ms (next.js: 7ms, application-code: 1917ms)
